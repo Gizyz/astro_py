@@ -18,6 +18,5 @@ while True:
     
     P1.move()
 
-
     pygame.display.update()
     FramePerSec.tick(FPS)
