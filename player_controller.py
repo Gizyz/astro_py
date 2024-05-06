@@ -36,24 +36,26 @@ class Player(pygame.sprite.Sprite):
         if pygame.KEYUP:
             self.rotacc = 0
         if pressed_keys[K_LEFT]:
-            self.rotacc = ROTACC
-        if pressed_keys[K_RIGHT]:
             self.rotacc = -ROTACC
+        if pressed_keys[K_RIGHT]:
+            self.rotacc = ROTACC
         
 
 
 
-        self.acc = accelerator(self.acc, self.vel, FRIC)
+        (self.acc, self.vel) = accelerator(self.acc, self.vel, FRIC)
+        self.acc = self.vel + round(self.acc,2) * 0.5
 
-        self.rotacc = accelerator(self.rotacc, self.rotvel, ROTFRIC)
+        (self.rotacc, self.rotvel) = accelerator(self.rotacc, self.rotvel, ROTFRIC)
+        self.rotacc = self.rotvel + round(self.rotacc,2) * 0.5
         self.rot += self.rotacc
         self.rot %= 360
 
         (self.accxy.x, self.accxy.y) = xy_from_angle(self.acc, self.rot) 
         print("x_:",round(self.accxy.x,2), "y_:",round(self.accxy.x,2))
-        g
-        self.pos.x = self.accxy.x
-        self.pos.y = self.accxy.y
+        
+        self.pos.x += self.accxy.x
+        self.pos.y += self.accxy.y
 
         print(round(self.rot,2))
 
@@ -68,7 +70,7 @@ class Player(pygame.sprite.Sprite):
 
         self.saved_center=self.rect.center
 
-        self.rot_surf = pygame.transform.rotate(self.surf, self.rot)
+        self.rot_surf = pygame.transform.rotate(self.surf, -self.rot)
         self.rect = self.surf.get_rect()
 
         self.rect.midbottom = self.pos
@@ -77,10 +79,9 @@ class Player(pygame.sprite.Sprite):
 def accelerator(acceleration, velocity, friction):
     acceleration += velocity * friction
     velocity += acceleration
-    return velocity + round(acceleration,2) * 0.5
+    return (acceleration, velocity)
 
-
-def xy_from_angle(angle, hyphotenus):
+def xy_from_angle(hyphotenus, angle):
     x = hyphotenus * math.cos(math.radians(angle))
     y = math.tan(math.radians(angle))*x
     return (x,y)
